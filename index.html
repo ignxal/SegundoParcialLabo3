@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+    <title>Ignacio Logiudice - Labo3</title>
+    <style>
+      body {
+        background-color: lightgrey;
+        width: 100%;
+        height: 100%;
+
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+
+      body.activo {
+        overflow: auto;
+      }
+
+      #mostrar {
+        position: absolute;
+        top: 0;
+        z-index: 1000;
+
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        opacity: 1;
+
+        transition: all 0.5s ease;
+      }
+
+      #mostrar.ocultar {
+        top: -100%;
+        opacity: 0;
+      }
+
+      /**/
+
+      #cerrar {
+        margin-left: 20px;
+        top: 10px;
+        color: black;
+      }
+
+      #cerrar:hover {
+        cursor: pointer;
+      }
+
+      #alerta {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+
+      table {
+        text-align: center;
+        border-collapse: collapse;
+        margin: 10px;
+        font-size: 18px;
+      }
+
+      thead {
+        background: whitesmoke;
+      }
+
+      td {
+        padding: 8px;
+        background: #dff7f7;
+        border: 4px solid white;
+        font-size: 18px;
+        color: black;
+        cursor: pointer;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-around;
+      }
+
+      h2 {
+        text-align: center;
+      }
+
+      tr:hover td {
+        background: #8bdaf7;
+        border: 4px solid white;
+        color: white;
+      }
+
+      .pagina {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .spinnerCustom {
+        width: 100%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+      }
+
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+      }
+
+      .show {
+        display: flex;
+        justify-content: space-between;
+        background-color: #fff;
+        border-radius: 10px;
+        margin-top: 10px;
+        padding: 5px;
+      }
+
+      input {
+        width: 100%;
+      }
+
+      input.button {
+        width: 100%;
+        background-color: #0061d8;
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 8px 8px;
+      }
+
+      div.alta input {
+        width: 100%;
+        border-radius: 10px;
+      }
+
+      input.button:hover {
+        background-color: #87fff8;
+      }
+
+      .botones {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+      }
+
+      div.divTabla {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .abm {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        flex-direction: column;
+        padding: 16px;
+        margin: 30px;
+        top: 50px;
+        border-radius: 4px;
+        background-color: #dff7f7;
+        width: 20%;
+      }
+
+      .abm label {
+        display: inline-block;
+        width: 100px;
+        margin: 5px;
+      }
+
+      .abm .error {
+        background-color: red;
+        width: 90%;
+      }
+    </style>
+  </head>
+
+  <body id="body">
+    <div class="pagina">
+      <h1>Formulario Ignacio Logiudice</h1>
+
+      <div id="divTabla" class="ocultar">
+        <header>
+          <div>
+            <label>Filtrar por: </label>
+            <select id="filtro">
+              <option value="Todos" selected>Todos</option>
+              <option value="Aereos">Aereos</option>
+              <option value="Terrestres">Terrestres</option>
+            </select>
+          </div>
+        </header>
+
+        <table id="tabla">
+          <thead id="tableHead">
+            <tr id="tableHeadTr" class="sort">
+              <th id="tablaId">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPorId"
+                  value="Id"
+                />
+              </th>
+              <th id="tablaModelo">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPorModelo"
+                  value="Modelo"
+                />
+              </th>
+              <th id="tablaanoFab">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPoranoFab"
+                  value="Año Fab"
+                />
+              </th>
+              <th id="tablaVelMax">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPorVelMax"
+                  value="Vel Max"
+                />
+              </th>
+              <th id="tablaaltMax">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPoraltMax"
+                  value="Alt Max"
+                />
+              </th>
+              <th id="tablaAutonomia">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPorAutonomia"
+                  value="Autonomia"
+                />
+              </th>
+              <th id="tablaCantPue">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPorCantPue"
+                  value="Cant Pue"
+                />
+              </th>
+              <th id="tablaCantRue">
+                <input
+                  class="button"
+                  type="button"
+                  id="OrdenarPorCantRue"
+                  value="Cant Rue"
+                />
+              </th>
+              <th id="tablaModificar">
+                <input
+                  class="button"
+                  type="button"
+                  id="buttonModificar"
+                  value="Modificar"
+                />
+              </th>
+              <th id="tablaCancelar">
+                <input
+                  class="button"
+                  type="button"
+                  id="buttonCancelar"
+                  value="Cancelar"
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody id="bodyTabla"></tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <div class="spinner-border spinnerCustom" role="status" id="spinner">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+
+      <div class="alta ocultar">
+        <input
+          class="button"
+          type="button"
+          id="nuevoVehiculo"
+          value="Nuevo elemento"
+        />
+      </div>
+
+      <form class="abm ocultar" id="formAbm">
+        <h2 id="abmTitle">Alta vehiculo</h2>
+        <div>
+          <label>ID:</label
+          ><input type="number" id="inputId" name="id" disabled />
+        </div>
+        <div>
+          <label>Modelo:</label
+          ><input type="text" id="inputModelo" name="modelo" />
+        </div>
+        <div>
+          <label>anoFab:</label
+          ><input type="text" id="inputanoFab" name="anoFab" />
+        </div>
+        <div>
+          <label>VelMax:</label
+          ><input type="text" id="inputVelMax" name="velMax" />
+        </div>
+        <div id="divSelect">
+          <label>Tipo:</label>
+          <select id="select">
+            <option value="Aereo">Aereo</option>
+            <option value="Terrestre">Terrestre</option>
+          </select>
+        </div>
+        <div>
+          <label id="lblOpcional1">altMax:</label
+          ><input type="text" id="inputOpcional1" />
+        </div>
+        <div>
+          <label id="lblOpcional2">Autonomia:</label
+          ><input type="text" id="inputOpcional2" />
+        </div>
+
+        <label id="error" class="error"></label>
+        <div class="botones">
+          <input type="button" class="boton" id="nuevo" value="Alta" />
+          <input type="button" class="boton" id="modificar" value="Modificar" />
+          <input type="button" class="boton" id="eliminar" value="Eliminar" />
+          <input type="button" class="boton" id="cancelar" value="Cancelar" />
+        </div>
+      </form>
+
+      <div class="alert alert-danger" role="alert" id="alerta">
+        <div>
+          <span id="error1"
+            >A simple danger alert with Give it a click if you like.</span
+          >
+          <span id="cerrar">X</span>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    function OcultarTodo(bool) {
+      tabla = document.getElementById("divTabla");
+      alta = document.getElementById("nuevoVehiculo");
+      if (bool) {
+        tabla.style.display = "none";
+        alta.style.display = "none";
+      } else {
+        tabla.style.display = "";
+        alta.style.display = "";
+      }
+    }
+
+    function spinner() {
+      const spinner = document.getElementById("spinner");
+
+      if (spinner.style.display === "none") {
+        const overlay = document.createElement("div");
+        overlay.id = "overlay";
+        spinner.style.display = "";
+        document.body.appendChild(overlay); // Add the overlay to the body
+      } else {
+        const overlay = document.getElementById("overlay");
+        spinner.style.display = "none";
+        if (overlay.parentNode === document.body) {
+          document.body.removeChild(overlay); // Remove the overlay from the body
+        }
+      }
+    }
+    class Vehiculo {
+      id;
+      modelo;
+      anoFab;
+      velMax;
+
+      constructor(id, modelo, anoFab, velMax) {
+        this.id = id;
+        this.modelo = primerLetraMayuscula(modelo);
+        this.anoFab = anoFab;
+        this.velMax = velMax;
+      }
+    }
+
+    class Aereo extends Vehiculo {
+      altMax;
+      autonomia;
+
+      constructor(id, modelo, anoFab, velMax, altMax, autonomia) {
+        super(id, modelo, anoFab, velMax);
+        this.altMax = altMax;
+        this.autonomia = autonomia;
+      }
+    }
+
+    class Terrestre extends Vehiculo {
+      cantPue;
+      cantRue;
+
+      constructor(id, modelo, anoFab, velMax, cantPue, cantRue) {
+        super(id, modelo, anoFab, velMax);
+        this.cantPue = cantPue;
+        this.cantRue = cantRue;
+      }
+    }
+
+    function primerLetraMayuscula(str) {
+      if (str != "") {
+        str = str[0].toUpperCase() + str.substring(1);
+      }
+      return str;
+    }
+
+    document.addEventListener("readystatechange", (event) => {
+      if (event.target.readyState === "interactive") {
+        cambiarVisibilidad();
+        OcultarTodo(true);
+      } else if (event.target.readyState === "complete") {
+        initApp();
+      }
+    });
+
+    async function initApp() {
+      fetch("http://localhost/vehiculoAereoTerrestre.php")
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            mostrarError("Ocurrio un error al comunicarse con el servidor.");
+          }
+        })
+        .then((resp) => {
+          array = resp;
+          cargarVehiculos();
+          OcultarTodo(false);
+          spinner();
+        });
+      // .catch((err) => {
+      //    mostrarError("Ocurrio un error al comunicarse con el servidor." + err);
+      // })
+    }
+
+    function cargarVehiculos() {
+      arrayVehiculos = array.map((object) => {
+        if (isAereoJSON(object) && aereoValido(object))
+          return new Aereo(
+            object.id,
+            object.modelo,
+            object.anoFab,
+            object.velMax,
+            object.altMax,
+            object.autonomia
+          );
+        else if (isTerrestreJSON(object) && terrestreValido(object))
+          return new Terrestre(
+            object.id,
+            object.modelo,
+            object.anoFab,
+            object.velMax,
+            object.cantPue,
+            object.cantRue
+          );
+      });
+
+      generarTabla();
+    }
+
+    function isAereoJSON(object) {
+      return (
+        object.hasOwnProperty("altMax") && object.hasOwnProperty("autonomia")
+      );
+    }
+
+    function isTerrestreJSON(object) {
+      return (
+        object.hasOwnProperty("cantPue") && object.hasOwnProperty("cantRue")
+      );
+    }
+
+    function vehiculoValido(object) {
+      return (
+        object.id != "" &&
+        object.modelo != "" &&
+        object.velMax > 0 &&
+        object.anoFab % 1 == 0 &&
+        object.anoFab > 0 &&
+        object.velMax % 1 == 0 &&
+        object.velMax > 0
+      );
+    }
+
+    function terrestreValido(object) {
+      return (
+        vehiculoValido(object) &&
+        object.cantPue % 1 == 0 &&
+        object.cantPue >= 0 &&
+        object.cantRue % 1 == 0 &&
+        object.cantRue > 0
+      );
+    }
+
+    function aereoValido(object) {
+      return (
+        vehiculoValido(object) &&
+        object.autonomia > 0 &&
+        object.autonomia % 1 == 0 &&
+        object.altMax % 1 == 0 &&
+        object.altMax > 0
+      );
+    }
+
+    // Formulario ALTA
+    const btnnuevoVehiculo = document.getElementById("nuevoVehiculo");
+    btnnuevoVehiculo.addEventListener("click", cambiarVisibilidad);
+
+    const botonAlta = document.getElementById("nuevo");
+    botonAlta.addEventListener("click", agregarVehiculo);
+
+    const botonCancelar = document.getElementById("cancelar");
+    botonCancelar.addEventListener("click", cambiarVisibilidad);
+
+    const botonModificar = document.getElementById("modificar");
+    botonModificar.addEventListener("click", modificarVehiculo);
+
+    const select = document.getElementById("select");
+    select.addEventListener("change", cambiarOpciones);
+
+    let vehiculo = null;
+
+    function agregarVehiculo() {
+      let vehiculo = leerDatos();
+      if (vehiculo) {
+        delete vehiculo.id;
+        let xhttp = new XMLHttpRequest();
+        spinner();
+
+        xhttp.onreadystatechange = function () {
+          if (xhttp.readyState == 4) {
+            if (xhttp.status == 200) {
+              vehiculo.id = JSON.parse(xhttp.responseText)["id"];
+              arrayVehiculos.push(vehiculo);
+              generarTabla();
+              cambiarVisibilidad();
+            } else {
+              mostrarError("No se pudo dar de alta al vehiculo.");
+              generarTabla();
+              cambiarVisibilidad();
+            }
+            spinner();
+          }
+        };
+
+        xhttp.open("PUT", "http://localhost/vehiculoAereoTerrestre.php", true);
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send(JSON.stringify(vehiculo));
+      }
+    }
+
+    let cerrarError = document.getElementById("cerrar");
+    cerrarError.addEventListener("click", ocultarError);
+
+    function mostrarError(error) {
+      const error1 = document.getElementById("error1");
+      error1.innerText = error;
+
+      const alerta = document.getElementById("alerta");
+      alerta.style.display = "flex";
+
+      setTimeout(ocultarError, 10000);
+    }
+
+    function ocultarError() {
+      document.getElementById("alerta").style.display = "none";
+    }
+
+    function generarId() {
+      let id;
+      do {
+        id = Math.floor(Math.random() * 10000) + 1;
+      } while (arrayVehiculos.some((p) => p.id == id));
+
+      return id;
+    }
+
+    function leerDatos() {
+      let vehiculoRecibido;
+      let id = document.getElementById("inputId").value;
+
+      if (id == "") {
+        id = generarId();
+      }
+
+      let modelo = document.getElementById("inputModelo").value;
+      let anoFab = document.getElementById("inputanoFab").value;
+      let velMax = document.getElementById("inputVelMax").value;
+
+      //La seleccion es aereo
+      if (document.getElementById("select").value == "Aereo") {
+        const altMax = document.getElementById("inputOpcional1").value;
+        const autonomia = document.getElementById("inputOpcional2").value;
+        vehiculoRecibido = new Aereo(
+          id,
+          modelo,
+          anoFab,
+          velMax,
+          altMax,
+          autonomia
+        );
+
+        if (aereoValido(vehiculoRecibido)) {
+          vehiculoRecibido.id = parseInt(vehiculoRecibido.id);
+          vehiculoRecibido.velMax = parseInt(vehiculoRecibido.velMax);
+          vehiculoRecibido.altMax = parseInt(vehiculoRecibido.velMax);
+
+          vehiculoRecibido.cantPue = undefined;
+          vehiculoRecibido.cantRue = undefined;
+
+          return vehiculoRecibido;
+        } else {
+          mostrarError("Hay un error al cargar los campos.");
+        }
+      } else {
+        const cantPue = document.getElementById("inputOpcional1").value;
+        const cantRue = document.getElementById("inputOpcional2").value;
+
+        vehiculoRecibido = new Terrestre(
+          id,
+          modelo,
+          anoFab,
+          velMax,
+          cantPue,
+          cantRue
+        );
+
+        if (terrestreValido(vehiculoRecibido)) {
+          vehiculoRecibido.id = parseInt(vehiculoRecibido.id);
+          vehiculoRecibido.velMax = parseInt(vehiculoRecibido.velMax);
+          vehiculoRecibido.cantRue = parseInt(vehiculoRecibido.cantRue);
+          vehiculoRecibido.altMax = undefined;
+          vehiculoRecibido.autonomia = undefined;
+
+          return vehiculoRecibido;
+        } else {
+          mostrarError("Hay un error al cargar los campos.");
+        }
+      }
+
+      return null;
+    }
+
+    function cambiarOpciones() {
+      if (document.getElementById("select").value == "Aereo") {
+        document.getElementById("lblOpcional1").innerHTML = "altMax:";
+        document.getElementById("lblOpcional2").innerHTML = "Autonomia:";
+      } else {
+        document.getElementById("lblOpcional1").innerHTML = "CantPue:";
+        document.getElementById("lblOpcional2").innerHTML = "CantRue:";
+      }
+    }
+
+    function validarId(id) {
+      return !arrayVehiculos.some((vehiculo) => vehiculo.id == id);
+    }
+
+    function cambiarVisibilidad() {
+      let e = document.getElementById("formAbm");
+      let tabla = document.getElementById("divTabla");
+      let boton = document.getElementById("nuevoVehiculo");
+
+      if (e.style.display == "") {
+        e.style.display = "none";
+        tabla.style.display = "";
+        boton.value = "Agregar elemento";
+
+        limpiarCampos();
+        document.getElementById("nuevo").style.display = "";
+        document.getElementById("modificar").style.display = "none";
+        document.getElementById("eliminar").style.display = "none";
+        document.getElementById("abmTitle").innerText = "Alta vehiculo";
+      } else {
+        e.style.display = "";
+        tabla.style.display = "none";
+        boton.value = "Volver";
+        divSelect.style.display = "";
+      }
+    }
+
+    //Al hacer click o eliminar se ejecuta
+    function cargarCampos() {
+      let idClickeado = event.target.parentNode.parentNode.id;
+
+      if (event.target.id == "btnModificar") {
+        document.getElementById("abmTitle").innerText = "Modificar vehiculo";
+        document.getElementById("nuevo").style.display = "none";
+        document.getElementById("modificar").style.display = "";
+        document.getElementById("eliminar").style.display = "none";
+      } else {
+        document.getElementById("abmTitle").innerText = "Eliminar vehiculo";
+        document.getElementById("nuevo").style.display = "none";
+        document.getElementById("modificar").style.display = "none";
+        document.getElementById("eliminar").style.display = "";
+      }
+
+      vehiculo = arrayVehiculos.find((p) => p.id == idClickeado);
+      cambiarVisibilidad();
+
+      document.getElementById("formAbm").style.display = "";
+
+      let id = (document.getElementById("inputId").value = vehiculo.id);
+      document.getElementById("inputModelo").value = vehiculo.modelo;
+      document.getElementById("inputanoFab").value = vehiculo.anoFab;
+      document.getElementById("inputVelMax").value = vehiculo.velMax;
+
+      let divSelect = document.getElementById("divSelect");
+      divSelect.style.display = "none";
+
+      if (vehiculo instanceof Terrestre) {
+        document.getElementById("select").value = "Terrestre";
+        cambiarOpciones();
+      }
+
+      document.getElementById("inputOpcional1").value =
+        vehiculo.altMax || vehiculo.cantPue;
+      document.getElementById("inputOpcional2").value =
+        vehiculo.autonomia || vehiculo.cantRue;
+    }
+
+    function limpiarCampos() {
+      document.getElementById("inputId").value = "";
+      document.getElementById("inputModelo").value = "";
+      document.getElementById("inputanoFab").value = "";
+      document.getElementById("inputVelMax").value = "";
+      document.getElementById("select").value = "Aereo";
+      cambiarOpciones();
+      document.getElementById("inputOpcional1").value = "";
+      document.getElementById("inputOpcional2").value = "";
+      document.getElementById("error").innerHTML = "";
+      vehiculo = null;
+    }
+
+    async function modificarVehiculo() {
+      let vehiculo = leerDatos();
+
+      if (vehiculo) {
+        spinner();
+        let respuesta = await fetch(
+          "http://localhost/vehiculoAereoTerrestre.php",
+          {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(vehiculo),
+          }
+        );
+        if (respuesta.status == 200) {
+          let index = arrayVehiculos.findIndex((x) => x.id === vehiculo.id);
+
+          if (index !== -1) {
+            arrayVehiculos[index] = vehiculo;
+            cambiarVisibilidad();
+            spinner();
+            generarTabla();
+            ocultarError();
+          } else {
+            mostrarError(
+              "Error. No se pudo realizar la modificacion. Intente nuevamente."
+            );
+            spinner();
+            cambiarVisibilidad();
+          }
+        } else {
+          mostrarError(
+            "Error. No se pudo realizar la modificacion. Intente nuevamente."
+          );
+          spinner();
+          cambiarVisibilidad();
+        }
+      }
+    }
+
+    //----------------------------------------TABLA-------------------------------------
+    const filtroSelect = document.getElementById("filtro");
+    filtroSelect.addEventListener("change", filtrarTabla);
+
+    function filtrarTabla() {
+      const selectedOption = filtroSelect.value;
+      let filteredData = [];
+
+      if (selectedOption === "Todos") {
+        filteredData = arrayVehiculos;
+      } else if (selectedOption === "Aereos") {
+        filteredData = arrayVehiculos.filter(
+          (vehiculo) => vehiculo instanceof Aereo
+        );
+      } else if (selectedOption === "Terrestres") {
+        filteredData = arrayVehiculos.filter(
+          (vehiculo) => vehiculo instanceof Terrestre
+        );
+      }
+
+      generarTabla(filteredData);
+    }
+
+    let botonEliminar = document.getElementById("eliminar");
+    botonEliminar.addEventListener("click", eliminarVehiculo);
+
+    function generarTabla(data = null) {
+      limpiarTabla();
+      const filtroTipo = filtro.value;
+      const vehiculosParaMostrar = data ? data : arrayVehiculos;
+
+      if (bodyTabla.childElementCount == 0) {
+        insertarVehiculos(vehiculosParaMostrar);
+      }
+    }
+
+    function insertarVehiculos(vehiculos) {
+      let bodyTabla = document.getElementById("bodyTabla");
+
+      vehiculos.forEach((vehiculo) => {
+        let arrayVehiculo = [
+          vehiculo.id,
+          vehiculo.modelo,
+          vehiculo.anoFab,
+          vehiculo.velMax,
+          vehiculo.altMax,
+          vehiculo.autonomia,
+          vehiculo.cantPue,
+          vehiculo.cantRue,
+        ];
+        let nuevoTr = document.createElement("tr");
+        nuevoTr.id = vehiculo.id;
+
+        arrayVehiculo.forEach((atributo) => {
+          if (atributo == 0) {
+            atributo = 4;
+          }
+          let td = document.createElement("td");
+          td.id = "td" + arrayVehiculo[0] + "-" + atributo;
+          td.textContent = atributo || "N/A";
+          nuevoTr.appendChild(td);
+        });
+
+        let nuevoTd = document.createElement("td");
+        let btnModificar = document.createElement("button");
+        btnModificar.classList = "btn btn-warning mx-1";
+        btnModificar.innerText = "Modificar";
+        btnModificar.id = "btnModificar";
+        btnModificar.addEventListener("click", cargarCampos);
+        nuevoTd.appendChild(btnModificar);
+        nuevoTr.appendChild(nuevoTd);
+
+        nuevoTd = document.createElement("td");
+        let btnEliminar = document.createElement("button");
+        btnEliminar.classList = "btn btn-danger mx-1";
+        btnEliminar.innerText = "Eliminar";
+        btnEliminar.id = "btnEliminar";
+        btnEliminar.addEventListener("click", cargarCampos);
+        nuevoTd.appendChild(btnEliminar);
+        nuevoTr.appendChild(nuevoTd);
+
+        bodyTabla.appendChild(nuevoTr);
+      });
+    }
+
+    function limpiarTabla() {
+      const bodyTabla = document.getElementById("bodyTabla");
+      bodyTabla.innerHTML = "";
+    }
+
+    async function eliminarVehiculo() {
+      const trs = document.getElementById("bodyTabla").childNodes;
+      vehiculo = leerDatos();
+
+      if (
+        vehiculo &&
+        confirm(
+          "¿Desea eliminar a " + vehiculo.modelo + " " + vehiculo.anoFab + "?"
+        )
+      ) {
+        spinner();
+
+        const respuesta = await fetch(
+          "http://localhost/vehiculoAereoTerrestre.php",
+          {
+            method: "DELETE",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({ id: vehiculo.id }),
+          }
+        );
+        if (respuesta.status == 200) {
+          arrayVehiculos = arrayVehiculos.filter((x) => x.id !== vehiculo.id);
+          generarTabla();
+          cambiarVisibilidad();
+          spinner();
+          ocultarError();
+        } else {
+          mostrarError(
+            "Error. No se pudo realizar la eliminacion. Intente nuevamente."
+          );
+          spinner();
+          cambiarVisibilidad();
+        }
+      }
+    }
+
+    const arrayOrdenarPor = new Array();
+    arrayOrdenarPor.push(
+      document.getElementById("OrdenarPorId"),
+      document.getElementById("OrdenarPorModelo"),
+      document.getElementById("OrdenarPoranoFab"),
+      document.getElementById("OrdenarPorVelMax"),
+      document.getElementById("OrdenarPoraltMax"),
+      document.getElementById("OrdenarPorAutonomia"),
+      document.getElementById("OrdenarPorCantPue"),
+      document.getElementById("OrdenarPorCantRue")
+    );
+
+    arrayOrdenarPor.forEach((input) => {
+      input.addEventListener("click", ordenar);
+    });
+
+    let ordenado;
+
+    function ordenar() {
+      let atributo = event.target.id.split("OrdenarPor")[1];
+
+      atributo = atributo[0].toLowerCase() + atributo.substring(1);
+      switch (ordenado) {
+        case "descendente":
+          arrayVehiculos.sort((a, b) =>
+            a[atributo]
+              ? a[atributo] < b[atributo]
+                ? 1
+                : b[atributo] == a[atributo]
+                ? 0
+                : -1
+              : ""
+          );
+          ordenado = "ascendente";
+          break;
+        case "ascendente":
+        default:
+          arrayVehiculos.sort((a, b) =>
+            a[atributo]
+              ? a[atributo] > b[atributo]
+                ? 1
+                : b[atributo] == a[atributo]
+                ? 0
+                : -1
+              : ""
+          );
+          ordenado = "descendente";
+          break;
+      }
+
+      generarTabla();
+    }
+  </script>
+</html>
